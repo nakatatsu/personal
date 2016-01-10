@@ -8,7 +8,10 @@ Vagrant.configure(2) do |config|
   config.ssh.username = 'vagrant'
   config.ssh.password = 'vagrant'
 
-  config.vm.synced_folder "C:/github/personal/Ansible", "/home/vagrant/Ansible"
+# 同期をかけると権限はフルアクセスとなるのだが
+# Ansibleの仕様としてinventoryファイルに実行権限がついているとエラーになる。
+# というわけで同期をかけずに地道にSCPで上げたほうがよい。
+#  config.vm.synced_folder "C:/github/personal/Ansible", "/home/vagrant/Ansible"
 
   config.vm.network "forwarded_port", guest: 22, host: 11010
   config.vm.network "public_network", ip: "192.168.10.100"
