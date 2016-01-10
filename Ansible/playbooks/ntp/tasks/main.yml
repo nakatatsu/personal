@@ -1,5 +1,5 @@
-- name: ntpƒCƒ“ƒXƒg[ƒ‹
+- name: ntpï¿½Cï¿½ï¿½ï¿½Xï¿½gï¿½[ï¿½ï¿½
   yum: name=ntp state=present
 
-- name: swapİ’è
+- name: swapï¿½İ’ï¿½
   shell: echo hoge;

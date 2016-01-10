@@ -8,5 +8,5 @@
 # jenkins
 - include: "../../../playbooks/jenkins"
 
-# PHP‚ÌCI—pƒc[ƒ‹‚à‚ë‚à‚ë
+# PHPã®CIç”¨
 - include: "../../../playbooks/php-ci"

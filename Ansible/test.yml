@@ -1,0 +1,7 @@
+- hosts: local
+  become: yes
+  remote_user: vagrant
+  vars_files:
+    - hosts/local/group_vars/all.yml
+  roles:
+    - test

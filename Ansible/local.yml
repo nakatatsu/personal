@@ -1,6 +1,0 @@
-# ‚à‚Á‚Ï‚çŽÀŒ±—p
-- hosts: all
-  become: yes
-  roles:
-    - common
-    - web

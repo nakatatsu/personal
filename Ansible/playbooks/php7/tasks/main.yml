@@ -1,5 +1,93 @@
-- name: ntp�C���X�g�[��
-  yum: name=ntp state=present
+- name: php7用リポジトリインストール
+  yum: name={{ item }} state=present
+  with_items:
+    - epel-release
+    - http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
 
-- name: swap�ݒ�
-  shell: echo hoge;
+- name: php7(とApache2.2)インストール
+  yum: name=php enablerepo=remi,remi-php70
+
+
+- name: Apache2.2の設定の修正（削除）
+  lineinfile: dest='/etc/httpd/conf/httpd.conf' regexp={{ item.regexp }}  state=absent
+  with_items:
+    - '^Options Indexes FollowSymLinks' # ファイル一覧画面を表示させない
+    - '^LoadModule auth_basic_module modules/mod_auth_basic.so'   # HTTP 基本認証でアクセス制限
+    - '^LoadModule auth_digest_module modules/mod_auth_digest.so' # Digest 認証
+    - '^LoadModule authn_file_module modules/mod_authn_file.so'   # .htpassword 等のユーザ認証用
+    - '^LoadModule authn_alias_module modules/mod_authn_alias.so' # 複数認証情報
+    - '^LoadModule authn_anon_module modules/mod_authn_anon.so'   # 匿名認証情報
+    - '^LoadModule authn_dbm_module modules/mod_authn_dbm.so'     # DBM認証情報
+    - '^LoadModule authn_default_module modules/mod_authn_default.so' # 認証系を使うなら入れておく。
+    - '^LoadModule authz_host_module modules/mod_authz_host.so' #  認証系を使うなら入れておく。
+    - '^LoadModule authz_user_module modules/mod_authz_user.so' #  認証系を使うなら入れておく。
+    - '^LoadModule authz_owner_module modules/mod_authz_owner.so' #  認証系を使うなら入れておく。
+    - '^LoadModule authz_groupfile_module modules/mod_authz_groupfile.so' #  認証系を使うなら入れておく。
+    - '^LoadModule authz_dbm_module modules/mod_authz_dbm.so' #  mod_authz_groupfileのdbm版
+    - '^LoadModule authz_default_module modules/mod_authz_default.so'# 認証系を使うなら入れておく。
+    - '^LoadModule ldap_module modules/mod_ldap.so' # LDAP機能用
+    - '^LoadModule authnz_ldap_module modules/mod_authnz_ldap.so' # LDAP機能用
+    - '^LoadModule include_module modules/mod_include.so' # SSI
+#     - '^LoadModule log_config_module modules/mod_log_config.so' # [必要] アクセスログなのでこれは要る。
+    - '^LoadModule logio_module modules/mod_logio.so' # 転送したバイト数をロギングしたければ使う。今回は別にしたくない。
+#    - '^LoadModule env_module modules/mod_env.so' # [必要] SetEnvで環境変数を渡すのに使うのがこれ。要る。
+    - '^LoadModule ext_filter_module modules/mod_ext_filter.so' # レスポンスを書き換える。やらない。
+    - '^LoadModule mime_magic_module modules/mod_mime_magic.so' # ファイルの内容を参照してMIMEタイプを判断する。”mod_mime”モジュールの予備的な位置づけらしい。
+#    - '^LoadModule expires_module modules/mod_expires.so' # [必要] クライアント側で画像などのファイルをキャッシュさせる。※ 別途設定が必要なので注意。<IfModule mod_expires.c>。負荷軽減には必須。
+#    - '^LoadModule deflate_module modules/mod_deflate.so' # [必要] コンテンツの圧縮転送。http://www.atmarkit.co.jp/ait/articles/0510/07/news107.html これも負荷軽減には必須。
+    - '^LoadModule headers_module modules/mod_headers.so' # [必要？] ヘッダの操作に使うらしいのだがPHPにも影響するのかわからないのでとりあえず切ってみる。
+    - '^LoadModule usertrack_module modules/mod_usertrack.so' # ユーザーをCookieを使ってトラッキングできるようにする
+#    - '^LoadModule setenvif_module modules/mod_setenvif.so' # リクエスト次第でENVをつける。やりたければ使う。http://www.drk7.jp/MT/archives/000903.html
+    - '^LoadModule mime_module modules/mod_mime.so' #  [必要] mime情報（ヘッダに入ってるあれとか）を司るらしい。ないとまずそう。
+    - '^LoadModule dav_module modules/mod_dav.so' # WebDAV機能用
+    - '^LoadModule status_module modules/mod_status.so' # サーバー情報を表示する。むしろ隠さねば。
+    - '^LoadModule autoindex_module modules/mod_autoindex.so' # ディレクトリに直リンしたら中を見られるようにする。これも入れたらまずい系。
+    - '^LoadModule info_module modules/mod_info.so' # サーバーの設定情報を出力できるようにする。やめて！
+    - '^LoadModule dav_fs_module modules/mod_dav_fs.so' # DAV系機能らしい
+    - '^LoadModule vhost_alias_module modules/mod_vhost_alias.so' # サブドメイン量産用。レンサバ向け。
+    - '^LoadModule negotiation_module modules/mod_negotiation.so' # 拡張子省略を可能にする？ たぶんいらないが多言語対応もこれらしい。DefaultLanguageをONにしておいた。
+    - '^ForceLanguagePriority' # mod_negotiation.soに連座。デフォではForceLanguagePriority Prefer Fallbackとある。
+    - '^LanguagePriority ' # mod_negotiation.soに連座。デフォではLanguagePriority en ca cs da de el eo es et fr he hr it ja ko ltz nl nn no pl pt pt-BR ru sv zh-CN zh-TW
+    - '^LoadModule dir_module modules/mod_dir.so' # ディレクトリへのアクセスに/がないときに補ってあげるもの。http://example.com/module/action の形を取るようなURIを使わせるような場合にもしかすると必要になるかも？
+    - '^LoadModule actions_module modules/mod_actions.so' # 特定ファイルの読み込み時に何か起動させるなら使う。画像ファイルなら認証済かをチェックするとか。
+    - '^LoadModule speling_module modules/mod_speling.so' # スペルミスをしても修正してリダイレクトしてくれるらしい。
+    - '^LoadModule userdir_module modules/mod_userdir.so' # レンサバで各ユーザーがhomeディレクトリ以下に作った公開ファイルを閲覧できるようにしているあれ。不要。
+    - '^LoadModule alias_module modules/mod_alias.so' # ドキュメントルート以下ではない場所のファイルを見せることができるらしいが必要ない。
+    - '^LoadModule substitute_module modules/mod_substitute.so' # リクエストの書き換え。似たようなことはSetEnvでアプリ的に行うので不要。
+#    - '^LoadModule rewrite_module modules/mod_rewrite.so' # [必要] カッコいいアドレスを使うために必須。
+    - '^LoadModule proxy_module modules/mod_proxy.so' # 今回はプロキシじゃないし。
+    - '^LoadModule proxy_balancer_module modules/mod_proxy_balancer.so' # プロキシにロードバランス機能をつけるらしい。すごい。けど今回はプロキシじゃないし。
+    - '^LoadModule proxy_ftp_module modules/mod_proxy_ftp.so' # 今回はプロキシじゃ（ｒｙ
+    - '^LoadModule proxy_http_module modules/mod_proxy_http.so' # 今回はプロ（ｒｙ
+    - '^LoadModule proxy_ajp_module modules/mod_proxy_ajp.so' # 今回（ｒｙ
+    - '^LoadModule proxy_connect_module modules/mod_proxy_connect.so' # （ｒｙ
+    - '^LoadModule cache_module modules/mod_cache.so' # もしかしたら使えるかも？ 同一リクエストに対してキャッシュを返す。ただし結構危険なので（ともすれば古いキャッシュを返してしまう）使えそうなら使う感じで。
+    - '^LoadModule suexec_module modules/mod_suexec.so' # Suexec。使わない。
+    - '^LoadModule disk_cache_module modules/mod_disk_cache.so' # mod_cache用。ディスクキャッシュに使う。
+    - '^LoadModule cgi_module modules/mod_cgi.so' # PHPもCGIモードで動かすなら要るが、多分ないだろう。
+    - '^LoadModule version_module modules/mod_version.so' # バージョン違いの差をIFで分岐させつつ同じコンフィグに書けるようにする。そもそもバージョンは統一する予定。
+
+# 参考
+# http://qiita.com/kou/items/acb3dcf1dcb428d7a3ec
+# http://heartbeats.jp/hbblog/2015/02/apache-mpm.html
+# TODO いくつかの設定はコンフィグに逃がして可変にしたほうがいい
+- name: Apache2.2の設定の修正（編集・追加）
+  replace: dest='/etc/httpd/conf/httpd.conf' regexp={{ item.regexp }} line={{ item.line }} state=present
+  with_items:
+    - { regexp: '^ServerTokens ',        line: 'ServerTokens Prod' }     # ＯＳの表示を無くす
+    - { regexp: '^ServerSignature ',     line: 'ServerSignature Off' }   # Ａｐａｃｈｅのバージョンを出さない
+    - { regexp: '^ServerName ',          line: 'ServerName www.example.com:80' } # サーバーネームの設定
+    - { regexp: '^DefaultLanguage ',     line: 'DefaultLanguage ja' }    # デフォルト言語。mod_negotiation.soを無効にしているので。
+    - { regexp: '^StartServers ',        line: 'StartServers       10' } # 起動時に生成する子プロセスの数。
+    - { regexp: '^MinSpareServers ',     line: 'MinSpareServers    10' } # 待機時の最小子プロセス数
+    - { regexp: '^MaxSpareServers ',     line: 'MaxSpareServers    20' } # 待機時の最大子プロセス数
+    - { regexp: '^ServerLimit ',         line: 'ServerLimit       256' } # 子プロセス数上限
+    - { regexp: '^MaxClients ',          line: 'MaxClients        256' } # 最大同時リクエスト数
+    - { regexp: '^MaxRequestsPerChild ', line: 'MaxRequestsPerChild  10000' } # 子プロセスが稼働中に扱うリクエスト数の上限。子サーバプロセスの寿命。
+    - { regexp: '^Timeout 60 ',          line: 'Timeout 30' } # タイムアウト
+    - { regexp: '^KeepAlive ',           line: 'KeepAlive Off' } # キープアライブ。元々オフのはずだが念のため。
+
+
+
+- name: apache（再）起動
+  yum: name=httpd state=restarted enabled=yes
