@@ -1,0 +1,13 @@
+# ÉçÉPÅ[Éã
+- include: "../../../playbooks/locale"
+
+# ntp
+- include: "../../../playbooks/ntp"
+
+# swap
+- include: "../../../playbooks/swap"
+
+# cron
+- include: "../../../playbooks/cron"
+
+

@@ -1,0 +1,12 @@
+
+# php7
+- include: "../../../playbooks/php7"
+
+# java-sdk
+- include: "../../../playbooks/java-sdk"
+
+# jenkins
+- include: "../../../playbooks/jenkins"
+
+# PHP‚ÌCI—pƒc[ƒ‹‚à‚ë‚à‚ë
+- include: "../../../playbooks/php-ci"

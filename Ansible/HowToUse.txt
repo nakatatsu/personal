@@ -1,0 +1,12 @@
+# Ansible インストール
+yum install ansible
+
+# バージョンの確認
+ansible --version
+
+# 実行時のコマンド
+ansible-playbook -i hosts/local web.yml
+
+
+# ディレクトリ構成の参考
+http://dev.classmethod.jp/server-side/ansible/ansible-inventory-pattern/

@@ -1,0 +1,9 @@
+- hosts: all
+  become: yes
+#  vars:
+#    APP_ENV: {{ ENV }}
+
+
+  roles:
+    - common
+    - web

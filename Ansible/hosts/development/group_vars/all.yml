@@ -1,0 +1,2 @@
+stage: development
+ssh_remote_user: vagrant

@@ -1,0 +1,5 @@
+- name: ntpインストール
+  yum: name=ntp state=present
+
+- name: swap設定
+  shell: echo hoge;
