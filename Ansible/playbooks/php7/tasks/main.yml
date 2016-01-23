@@ -61,7 +61,7 @@
 #    - ^LoadModule deflate_module modules/mod_deflate.so # [必要] コンテンツの圧縮転送。http://www.atmarkit.co.jp/ait/articles/0510/07/news107.html これも負荷軽減には必須。
     - ^LoadModule headers_module modules/mod_headers.so # [必要？] ヘッダの操作に使うらしいのだがPHPにも影響するのかわからないのでとりあえず切ってみる。
     - ^LoadModule usertrack_module modules/mod_usertrack.so # ユーザーをCookieを使ってトラッキングできるようにする
-#    - ^LoadModule setenvif_module modules/mod_setenvif.so # リクエスト次第でENVをつける。やりたければ使う。http://www.drk7.jp/MT/archives/000903.html
+    - ^LoadModule setenvif_module modules/mod_setenvif.so # リクエスト次第でENVをつける。やりたければ使う。http://www.drk7.jp/MT/archives/000903.html
 #    - ^LoadModule mime_module modules/mod_mime.so #  [必要] mime情報（ヘッダに入ってるあれとか）を司るらしい。ないとまずそう。
     - ^LoadModule dav_module modules/mod_dav.so # WebDAV機能用
     - ^LoadModule status_module modules/mod_status.so # サーバー情報を表示する。むしろ隠さねば。
@@ -110,7 +110,10 @@
     - { regexp: '^ServerName ',      line: 'ServerName www.example.com:80' } # サーバーネームの設定
     - { regexp: '^DefaultLanguage ', line: 'DefaultLanguage ja' }    # デフォルト言語。mod_negotiation.soを無効にしているので。
     - { regexp: '^Timeout 60',       line: 'Timeout 30' } # タイムアウト
-    - { regexp: '^KeepAlive ',       line: 'KeepAlive Off' } # キープアライブ。元々オフのはずだが念のため。
+    - { regexp: '^KeepAlive ',       line: 'KeepAlive Off' } # キープアライブ。
+
+# ただしAWSのEC2を使う場合はKeepAliveをむしろオンにして１２０秒とかにしたほうがいいらしい。
+#https://debiancdn.wordpress.com/2012/06/14/amazon-elb%E3%82%92%E3%81%86%E3%81%BE%E3%81%8F%E3%81%A4%E3%81%8B%E3%81%86%E3%81%AB%E3%81%AF%E3%80%81keepalive%E3%82%92%E6%9C%89%E5%8A%B9%E3%81%AB%E3%81%97%E3%82%88%E3%81%86%E3%80%82timeout%E3%81%AF60/
 
 # 参考
 # http://qiita.com/kou/items/acb3dcf1dcb428d7a3ec
@@ -129,7 +132,10 @@
 # TODO そういえばログの設定をしていないのでそちらも実施すべき。
 # TODO phpの設定もしていない
 #http://qiita.com/knife0125/items/0e1af52255e9879f9332
-
+# そういえばmemcachedをインストールしていない。
 
 - name: apache（再）起動
   service: name=httpd state=restarted enabled=yes
+
+
+
