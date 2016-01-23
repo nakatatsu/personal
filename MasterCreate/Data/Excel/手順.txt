@@ -1,0 +1,67 @@
+最下部にあるマクロを個人用マクロ ブック personal.xlsbに登録しておく。
+尚、personal.xlsbは保存するときに表示メニューから非表示扱いにしておかないと立ち上げ時に開かれてしまうため注意。
+
+============================================================
+Sub OutputCsv()
+    '
+    ' 変数の宣言
+    '
+    Dim maxRow, maxColumn As Long
+    Dim fileSystemObject As Object
+    Dim csvFileName As String
+    Dim fileNo As Integer
+    Dim x, y As Long
+    Dim messageReturn As Integer
+
+    messageReturn = MsgBox("CSVファイルを出力します", vbYesNo)
+    If messageReturn <> vbYes Then
+        MsgBox "キャンセルしました。"
+        Exit Sub
+    End If
+ 
+    '
+    ' 最終行、最終列の取得。
+    ' 参考: http://www.niji.or.jp/home/toru/notes/8.html
+    '
+    With ActiveSheet.UsedRange
+        maxRow = .Find("*", , xlFormulas, , xlByRows, xlPrevious).Row
+        maxColumn = .Find("*", , xlFormulas, , xlByColumns, xlPrevious).Column
+    End With
+
+    '
+    ' 書き出し先とするcsvファイル名の決定
+    '
+    Set fileSystemObject = CreateObject("Scripting.FileSystemObject")
+    csvFileName = fileSystemObject.GetParentFolderName(ActiveWorkbook.Path) & "\Csv\" & fileSystemObject.GetBaseName(ActiveWorkbook.Name) & ".csv"
+    
+    '
+    ' csvファイルに書き込み。
+    '
+    fileNo = FreeFile
+    Open csvFileName For Output As #fileNo
+
+    ' 仕様として1行目は無視。
+    For y = 2 To maxRow
+        For x = 1 To maxColumn - 1
+            ' 尻の; は改行無しを表す
+            Write #fileNo, "" & sanitize(Cells(y, x)) & "";
+        Next
+        '改行を挿入する
+        Write #fileNo, "" & Cells(y, maxColumn) & ""
+    Next
+
+    ' ファイルを閉じる
+    Close #fileNo
+    
+    MsgBox ("CSVファイルを出力しました。" & csvFileName)
+
+End Sub
+
+Function sanitize(Value As String) As String
+    Value = Replace(Value, vbCrLf, "\n")
+    Value = Replace(Value, vbCr, "\n")
+    Value = Replace(Value, vbLf, "\n")
+    sanitize = Replace(Value, """", ChrW(8221))
+    
+End Function
+
