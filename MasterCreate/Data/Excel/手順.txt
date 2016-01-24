@@ -1,5 +1,5 @@
-最下部にあるマクロを個人用マクロ ブック personal.xlsbに登録しておく。
-尚、personal.xlsbは保存するときに表示メニューから非表示扱いにしておかないと立ち上げ時に開かれてしまうため注意。
+下記のマクロを個人用マクロブック personal.xlsbに登録しておく。
+尚、personal.xlsbは表示メニューから非表示扱いにして保存しないと立ち上げ時に開かれてしまうため注意。
 
 ============================================================
 Sub OutputCsv()
@@ -42,12 +42,33 @@ Sub OutputCsv()
 
     ' 仕様として1行目は無視。
     For y = 2 To maxRow
-        For x = 1 To maxColumn - 1
-            ' 尻の; は改行無しを表す
-            Write #fileNo, "" & sanitize(Cells(y, x)) & "";
+        For x = 1 To maxColumn
+            ' 列名が入る行が空白の場合はスキップ
+            If Cells(2, x).Value = "" Then
+                ' goto!
+                GoTo Continue
+            End If
+
+
+            ' NULLと記述のある箇所はnull扱いであり文字列のNULLとしては扱わない。特殊な仕様。
+            If Cells(y, x).Value <> "NULL" Then
+                tmpStr = """" & sanitize(Cells(y, x)) & """"
+            Else
+                tmpStr = "NULL"
+            End If
+
+
+            If x <> maxColumn Then
+                ' 尻の; は改行無しを表す
+                Print #fileNo, tmpStr & ",";
+            Else
+                ' 改行を挿入する
+                Print #fileNo, tmpStr
+            End If
+Continue:
         Next
-        '改行を挿入する
-        Write #fileNo, "" & Cells(y, maxColumn) & ""
+
+
     Next
 
     ' ファイルを閉じる
