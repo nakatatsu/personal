@@ -1,9 +1,12 @@
-rem すごく。。。手抜きです。。。。
-rem ディレクトリの中身を抽出してループさせたかったんだけど力尽きたorz 。。。って順番を自分で規定しないといけないんだった。ディレクトリ読む式は元からだめじゃん。
-rem というわけでファイルリストを自分で書いて読み込む式にした。
+rem ファイルリストを自分で書いて読み込んでループ。
 for /f %%x in (importfiles.txt) do (
+    rem 文字コードをUTFにした一時ファイルを作成
     iconv -f Shift-JIS  -t UTF-8 %%x > %%x.utf 
+
+    rem UTFの一時ファイルをインポート
     mysqlimport -u root --password=password --local --delete --fields-enclosed-by \" --ignore-lines=1  --fields-terminated-by , --lines-terminated-by \n --host 192.168.10.101 --default-character-set=utf8 test_master %%x.utf
+
+    rem 一時ファイル削除
     del %%x.utf
 )
 
