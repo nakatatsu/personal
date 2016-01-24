@@ -63,7 +63,7 @@ Sub OutputCsv()
                 Print #fileNo, tmpStr & ",";
             Else
                 ' â¸çsÇë}ì¸Ç∑ÇÈ
-                Print #fileNo, tmpStr
+                Print #fileNo, tmpStr & vbLf;
             End If
 Continue:
         Next
@@ -85,4 +85,3 @@ Function sanitize(Value As String) As String
     sanitize = Replace(Value, """", ChrW(8221))
     
 End Function
-

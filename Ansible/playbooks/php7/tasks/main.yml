@@ -5,7 +5,7 @@
     - http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
 
 - name: php7(とApache2.2)インストール
-  yum: name={{ item }} enablerepo=remi,remi-php70
+  yum: name={{ item }} enablerepo=remi,remi-php70 state=present
   with_items:
     - curl-devel
     - php
