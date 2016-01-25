@@ -35,6 +35,7 @@
 - name: Apache2.2の設定の修正（削除）
   lineinfile: dest='/etc/httpd/conf/httpd.conf' state=absent regexp="{{ item }}"
   with_items:
+    - ^BrowserMatch # BrowserMatchはすべて削除
     - ^Options Indexes FollowSymLinks # ファイル一覧画面を表示させない
     - ^LoadModule auth_basic_module modules/mod_auth_basic.so   # HTTP 基本認証でアクセス制限
     - ^LoadModule auth_digest_module modules/mod_auth_digest.so # Digest 認証
@@ -61,7 +62,7 @@
 #    - ^LoadModule deflate_module modules/mod_deflate.so # [必要] コンテンツの圧縮転送。http://www.atmarkit.co.jp/ait/articles/0510/07/news107.html これも負荷軽減には必須。
     - ^LoadModule headers_module modules/mod_headers.so # [必要？] ヘッダの操作に使うらしいのだがPHPにも影響するのかわからないのでとりあえず切ってみる。
     - ^LoadModule usertrack_module modules/mod_usertrack.so # ユーザーをCookieを使ってトラッキングできるようにする
-    - ^LoadModule setenvif_module modules/mod_setenvif.so # リクエスト次第でENVをつける。やりたければ使う。http://www.drk7.jp/MT/archives/000903.html
+#    - ^LoadModule setenvif_module modules/mod_setenvif.so # リクエスト次第でENVをつける。やりたければ使う。http://www.drk7.jp/MT/archives/000903.html
 #    - ^LoadModule mime_module modules/mod_mime.so #  [必要] mime情報（ヘッダに入ってるあれとか）を司るらしい。ないとまずそう。
     - ^LoadModule dav_module modules/mod_dav.so # WebDAV機能用
     - ^LoadModule status_module modules/mod_status.so # サーバー情報を表示する。むしろ隠さねば。
@@ -130,12 +131,15 @@
     - { regexp: '^MaxRequestsPerChild .*', replace: 'MaxRequestsPerChild  10000' } # 子プロセスが稼働中に扱うリクエスト数の上限。子サーバプロセスの寿命。
 
 # TODO そういえばログの設定をしていないのでそちらも実施すべき。
-# TODO phpの設定もしていない
+
 #http://qiita.com/knife0125/items/0e1af52255e9879f9332
 # そういえばmemcachedをインストールしていない。
 
 - name: apache（再）起動
   service: name=httpd state=restarted enabled=yes
 
+- name: memcachedインストール
+  yum: name=memcached state=present
 
-
+- name: memcached（再）起動
+  service: name=memcached state=restarted enabled=yes

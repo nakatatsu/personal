@@ -1,5 +1,0 @@
-- name: ntp�C���X�g�[��
-  yum: name=ntp state=present
-
-- name: swap�ݒ�
-  shell: echo hoge;

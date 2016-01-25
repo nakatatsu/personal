@@ -1,0 +1,5 @@
+- name: cron
+  yum: name=crontabs state=present
+
+- name: cron再起動
+  service: name=crond state=restarted enabled=yes

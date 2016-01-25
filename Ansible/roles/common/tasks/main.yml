@@ -1,13 +1,7 @@
-# ロケール
-- include: "../../../playbooks/locale"
-
 # ntp
-- include: "../../../playbooks/ntp"
-
-# swap
-- include: "../../../playbooks/swap"
+- include: "../../../playbooks/ntp/tasks/main.yml"
 
 # cron
-- include: "../../../playbooks/cron"
+- include: "../../../playbooks/cron/tasks/main.yml"
 
 

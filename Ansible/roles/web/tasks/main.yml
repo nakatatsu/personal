@@ -1,12 +1,12 @@
 
 # php7
-- include: "../../../playbooks/php7"
-
-# java-sdk
-- include: "../../../playbooks/java-sdk"
-
-# jenkins
-- include: "../../../playbooks/jenkins"
-
-# PHPのCI用
-- include: "../../../playbooks/php-ci"
+- include: "../../../playbooks/php7/tasks/main.yml"
+#
+## java-sdk
+#- include: "../../../playbooks/java-sdk"
+#
+## jenkins
+#- include: "../../../playbooks/jenkins"
+#
+## PHPのCI用
+#- include: "../../../playbooks/php-ci"
