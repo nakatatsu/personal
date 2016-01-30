@@ -1,2 +1,32 @@
-# mysql
-- include: "../../../playbooks/mysql"
+
+- name: del mariadb
+  yum: name=mariadb-libs state=absent
+
+- name: mysql 5.7(リポジトリ)
+  yum: name={{ item }} state=present
+  with_items:
+    - http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
+
+
+- name: mysql 5.7
+  yum: name={{ item }} state=present
+  with_items:
+    - mysql-community-server
+
+#- name: 設定の修正
+#  lineinfile: dest='/etc/my.cnf' state=present regexp="{{ item.regexp }}" line="{{ item.line }}"
+#  with_items:
+#    - { regexp: '^default_password_lifetime=',    line: 'default_password_lifetime=0' }
+#    - { regexp: '^validate_password_policy=',    line: 'validate_password_policy=LOW' }  # ※ ローカル開発専用のときのみ利用すること
+#    - { regexp: '^validate_password=',    line: 'validate_password=OFF' }  # ※ ローカル開発専用のときのみ利用すること
+
+- name: mysql設定
+  shell: systemctl enable mysqld.service
+
+- name: mysql（再）起動
+  shell: systemctl restart mysqld.service
+
+# mysqlのrootパスワードが毎回変わるため自動では厳しいが、以下のSQLを打つ必要あり
+#  CREATE USER 'root'@'%' IDENTIFIED WITH mysql_native_password AS 'password'
+# SET PASSWORD FOR root = PASSWORD('password')
+#  GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';

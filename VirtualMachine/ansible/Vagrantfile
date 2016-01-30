@@ -2,12 +2,10 @@
 # vi: set ft=ruby :
 Vagrant.configure(2) do |config|
   config.vm.box = "ansible"
-  config.vm.box_url = "file://centos64-x86_64-20140116.box"
+  config.vm.box_url = "./centos7.box"
 
-# 同期をかけると権限はフルアクセスとなるのだが
-# Ansibleの仕様としてinventoryファイルに実行権限がついているとエラーになる。
-# というわけで同期をかけずに地道にSCPで上げたほうがよい。
-#  config.vm.synced_folder "C:/github/personal/Ansible", "/home/vagrant/Ansible"
+  # Ansibleのファイルを同期させるときはinventoryに実行権限がついていてはいけないので権限設定がMUST
+  config.vm.synced_folder "C:/github/personal/Ansible", "/home/vagrant/Ansible", :mount_options => ['dmode=775', 'fmode=664']
   config.vm.network :forwarded_port, guest: 22, host: 11010
   config.vm.network "public_network", ip: "192.168.10.100"
   config.vm.provider "virtualbox" do |vb|

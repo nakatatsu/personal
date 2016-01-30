@@ -1,7 +1,19 @@
 # ntp
-- include: "../../../playbooks/ntp/tasks/main.yml"
+- name: Set the correct timezone.
+  file: src="/usr/share/zoneinfo/Asia/Tokyo" dest=/etc/localtime state=link force=yes
+
+- name: ntp install
+  yum: name=ntp state=present
+
+- name: ntp start
+  service: name=ntpd state=started enabled=yes
 
 # cron
-- include: "../../../playbooks/cron/tasks/main.yml"
+- name: cron
+  yum: name=crontabs state=present
 
+- name: cron再起動
+  service: name=crond state=restarted enabled=yes
 
+- name: iptables無効化
+  shell: systemctl stop firewalld

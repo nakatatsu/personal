@@ -1,12 +1,42 @@
+- name: php7用リポジトリインストール
+  yum: name={{ item }} state=present
+  with_items:
+    - epel-release
+    - http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 
-# php7
-- include: "../../../playbooks/php7/tasks/main.yml"
-#
-## java-sdk
-#- include: "../../../playbooks/java-sdk"
-#
-## jenkins
-#- include: "../../../playbooks/jenkins"
-#
-## PHPのCI用
-#- include: "../../../playbooks/php-ci"
+
+- name: php7(とHTTPD2.4)インストール
+  yum: name={{ item }} enablerepo=remi,remi-php70 state=present
+  with_items:
+    - php
+    - php-devel
+    - php-cli
+    - php-common
+    - php-mbstring
+    - php-fpm
+    - php-gmp
+    - php-mbstring
+    - php-mcrypt
+    - php-opcache
+    - php-pdo
+    - php-xml
+    - php-pear
+    - php-pecl-msgpack
+    - php-pecl-apcu
+    - php-pecl-xdebug
+    - php-pecl-memcached
+    - php-openssl
+    - php-json
+    - php-pdo_mysql
+    - php-mysqlnd
+    - php-msgpack
+
+
+- name: apache（再）起動
+  service: name=httpd state=restarted enabled=yes
+
+- name: memcachedインストール
+  yum: name=memcached state=present
+
+- name: memcached（再）起動
+  service: name=memcached state=restarted enabled=yes
