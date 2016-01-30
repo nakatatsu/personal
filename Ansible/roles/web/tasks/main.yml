@@ -35,8 +35,17 @@
 - name: apache（再）起動
   service: name=httpd state=restarted enabled=yes
 
-- name: memcachedインストール
-  yum: name=memcached state=present
 
-- name: memcached（再）起動
-  service: name=memcached state=restarted enabled=yes
+- name: redisインストール
+  yum: name=redis state=present
+
+- name: redis（再）起動
+  service: name=redis state=restarted enabled=yes
+
+#
+## redis使うことにしたからmemcached使わない。
+#- name: memcachedインストール
+#  yum: name=memcached state=present
+#
+#- name: memcached（再）起動
+#  service: name=memcached state=restarted enabled=yes

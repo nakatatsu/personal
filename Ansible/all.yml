@@ -6,4 +6,5 @@
   roles:
     - common
     - web
-
+    - db
+    - mono
