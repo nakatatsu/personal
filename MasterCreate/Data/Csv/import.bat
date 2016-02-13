@@ -1,12 +1,12 @@
-rem ƒtƒ@ƒCƒ‹ƒŠƒXƒg‚ğ©•ª‚Å‘‚¢‚Ä“Ç‚İ‚ñ‚Åƒ‹[ƒvB
+rem ã‚ã‚‰ã‹ã˜ã‚ç”¨æ„ã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ãƒªã‚¹ãƒˆã‚’èª­ã¿è¾¼ã‚“ã§ãƒ«ãƒ¼ãƒ—ã€‚
 for /f %%x in (importfiles.txt) do (
-    rem •¶šƒR[ƒh‚ğUTF‚É‚µ‚½ˆêƒtƒ@ƒCƒ‹‚ğì¬
+    rem æ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚’UTFã«ã—ãŸä¸€æ™‚ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆ
     iconv -f Shift-JIS  -t UTF-8 %%x > %%x.utf 
 
-    rem UTF‚Ìˆêƒtƒ@ƒCƒ‹‚ğƒCƒ“ƒ|[ƒg
+    rem UTFã®ä¸€æ™‚ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚¤ãƒ³ãƒãƒ¼ãƒˆ
     mysqlimport -u root --password=password --local --delete --fields-enclosed-by \" --ignore-lines=1  --fields-terminated-by , --lines-terminated-by \n --host 192.168.10.101 --default-character-set=utf8 test_master %%x.utf
 
-    rem ˆêƒtƒ@ƒCƒ‹íœ
+    rem ä¸€æ™‚ãƒ•ã‚¡ã‚¤ãƒ«å‰Šé™¤
     del %%x.utf
 )
 
